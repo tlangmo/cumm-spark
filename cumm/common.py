@@ -41,6 +41,7 @@ def get_executable_path(executable: str) -> str:
 
 
 _GPU_NAME_TO_ARCH = {
+    r"(NVIDIA )?GB10": "120",
     r"(NVIDIA )?H100": "90",
     r"(NVIDIA )?A100": "80",
     r"(NVIDIA )?RTX A[0-9]000": "86",
@@ -87,6 +88,7 @@ def _get_cuda_arch_flags(is_gemm: bool = False) -> Tuple[List[str], List[Tuple[i
         ('Ampere', '8.0;8.6+PTX'),
         ('Hopper', '9.0+PTX'),
         ('Lovelace', '8.9+PTX'),
+        ('Blackwell', '12.0+PTX'),
     ])
 
     supported_arches = [
@@ -265,24 +267,48 @@ def _get_cuda_include_lib():
             include = windows_cuda_root / f"v{version_str}\\include"
             lib64 = windows_cuda_root / f"v{version_str}\\lib\\x64"
         else:
+            import platform
+            arch = platform.machine()
+            # Map architecture to CUDA target directory name
+            if arch == "aarch64":
+                target_dir = "sbsa-linux"  # CUDA 13+ uses sbsa-linux for aarch64
+            else:
+                target_dir = "x86_64-linux"
+
             try:
                 nvcc_path = subprocess.check_output(["which", "nvcc"
                                                     ]).decode("utf-8").strip()
-                lib = Path(nvcc_path).parent.parent / "lib"
-                include = Path(nvcc_path).parent.parent / "targets/x86_64-linux/include"
+                cuda_root = Path(nvcc_path).parent.parent
+                lib = cuda_root / "lib"
+                include = cuda_root / f"targets/{target_dir}/include"
                 if lib.exists() and include.exists():
                     if (lib / "libcudart.so").exists() and (include / "cuda.h").exists():
                         # should be nvidia conda package
                         _CACHED_CUDA_INCLUDE_LIB = ([include], lib)
                         return _CACHED_CUDA_INCLUDE_LIB
             except:
-                pass 
+                pass
 
             linux_cuda_root = Path("/usr/local/cuda")
-            include = linux_cuda_root / f"include"
-            lib64 = linux_cuda_root / f"lib64"
+            # Include both target-specific and generic include paths
+            target_include = linux_cuda_root / f"targets/{target_dir}/include"
+            generic_include = linux_cuda_root / "include"
+            # CUDA 13+ moves CCCL (libcudacxx) to include/cccl/ subdirectory
+            cccl_include = target_include / "cccl"
+            lib64 = linux_cuda_root / "lib64"
             assert linux_cuda_root.exists(), f"can't find cuda in {linux_cuda_root} install via cuda installer or conda first."
-        _CACHED_CUDA_INCLUDE_LIB = ([include], lib64)
+
+            includes = []
+            # Add CCCL path first for cuda/std/* headers (CUDA 13+)
+            if cccl_include.exists():
+                includes.append(cccl_include)
+            if target_include.exists():
+                includes.append(target_include)
+            if generic_include.exists():
+                includes.append(generic_include)
+            if not includes:
+                includes = [generic_include]  # fallback
+        _CACHED_CUDA_INCLUDE_LIB = (includes, lib64)
         return _CACHED_CUDA_INCLUDE_LIB
     else:
         return _CACHED_CUDA_INCLUDE_LIB
@@ -590,6 +616,7 @@ class CompileInfo(pccm.Class):
         code = pccm.code()
         code.arg("min_arch", "std::tuple<int, int>")
         cuda_ver_to_max_arch = [
+            ((13, 0), (12, 0)),
             ((12, 8), (10, 0)),
             ((11, 8), (9, 0)),
             ((11, 1), (8, 6)),

@@ -33,6 +33,7 @@ _GEMM_MIN_ARCH_TO_ALGO: List[Tuple[Tuple[int, int], List[str]]] = [
     ((7, 0), [GemmAlgo.Volta.value]),
     ((7, 5), [GemmAlgo.Turing.value]),
     ((8, 0), [GemmAlgo.Ampere.value]),
+    ((12, 0), [GemmAlgo.Ampere.value]),  # Blackwell/Spark uses Ampere kernels
 ]
 
 _GEMM_ALGO_TO_MIN_ARCH: Dict[str, Tuple[int, int]] = {}
