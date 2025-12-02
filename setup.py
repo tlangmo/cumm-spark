@@ -185,7 +185,7 @@ if disable_jit is not None and disable_jit == "1":
                       "cumm/core_cc",
                       Path(__file__).resolve().parent / "cumm",
                       extcallback=CopyHeaderCallback(),
-                      std="c++17" if compat.InMacOS else "c++14",)
+                      std="c++17",)
     ]
 else:
     cmdclass = {

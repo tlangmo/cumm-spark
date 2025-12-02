@@ -619,7 +619,7 @@ class NVRTCInlineBuilder(InlineBuilder):
             reload_when_code_change: bool = False,
             remote_addr: str = "",
             default_deps: Optional[List[Type[pccm.Class]]] = None,
-            std: str = "c++14",
+            std: str = "c++17",
             context: Optional[tv.Context] = None,
             mps_sync_func: Callable[[], None] = _default_mps_sync_func,
             mps_context: Optional[MPSContextBase] = None):

@@ -46,7 +46,7 @@ build-wheel: build-base
 		-w /cumm \
 		-e MAX_JOBS=4 \
 		$(BASE_IMAGE):$(TAG) \
-		python setup.py bdist_wheel
+		python setup.py bdist_wheel -vv
 	@echo "Wheel built: $(ROOT_DIR)/dist/"
 	@ls -lh $(ROOT_DIR)/dist/*.whl 2>/dev/null || echo "No wheel found"
 

@@ -81,7 +81,7 @@ def spgemm_build_exec():
                                verbose=False,
                                shared=False,
                                main_file_suffix=".cu",
-                               std="c++14")
+                               std="c++17")
     return output
 
 

@@ -180,7 +180,7 @@ def create_nvrtc_code(cus: List[pccm.Class],
                       namespace_root: Optional[Union[str, Path]] = None,
                       cudadevrt_path: str = "",
                       custom_names: Optional[List[str]] = None,
-                      std: str = "c++14",
+                      std: str = "c++17",
                       cpu_code: bool = False,
                       add_arch_flag: bool = True) -> NVRTCModuleParams:
     cg = CodeGenerator([])
@@ -466,7 +466,7 @@ class CummNVRTCModule(CummNVRTCModuleBase):
                  cudadevrt_path: str = "",
                  custom_names: Optional[List[str]] = None,
                  verbose_path: str = "",
-                 std: str = "c++14",
+                 std: str = "c++17",
                  add_arch_flag: bool = True) -> None:
         params = create_nvrtc_code(cus, namespace_root, cudadevrt_path,
                                        custom_names, std, add_arch_flag=add_arch_flag)
@@ -514,7 +514,7 @@ class CummLLVMModule:
                  namespace_root: Optional[Union[str, Path]] = None,
                  verbose: bool = False,
                  verbose_path: str = "",
-                 std: str = "c++14") -> None:
+                 std: str = "c++17") -> None:
         self.params: NVRTCModuleParams = create_nvrtc_code(cus,
                                                                namespace_root,
                                                                "", [],
@@ -721,7 +721,7 @@ class CummMetalModule:
                  namespace_root: Optional[Union[str, Path]] = None,
                  verbose: bool = False,
                  verbose_path: str = "",
-                 std: str = "c++14") -> None:
+                 std: str = "c++17") -> None:
         self.params: NVRTCModuleParams = create_nvrtc_code(cus,
                                                                namespace_root,
                                                                "", [],

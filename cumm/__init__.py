@@ -34,7 +34,7 @@ if project_is_installed(PACKAGE_NAME) and project_is_editable(
                               PACKAGE_ROOT / "core_cc",
                               namespace_root=PACKAGE_ROOT,
                               load_library=False,
-                              std="c++17" if compat.InMacOS else "c++14",
+                              std="c++17",
                               verbose=False)
 
 def _determine_windows_cuda_dll_dir():
